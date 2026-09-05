@@ -1,0 +1,21 @@
++---------------------------------------------------------------------------------------+
+|                               SECURITY GUARD MATRIX                                   |
++------------------------------+--------------------------+-----------------------------+
+| Threat Vector                | Vulnerability Profile    | Defense Implementation      |
++------------------------------+--------------------------+-----------------------------+
+| Slot Peeking / MEV Sandwich  | Validator looks ahead at | Enforced two-phase commit:  |
+|                              | randomness to bias wins  | settle must be slot > commit|
+|                              |                          | and <= commit + 250.        |
++------------------------------+--------------------------+-----------------------------+
+| Physical Dispenser Jam /     | User funds locked if     | Time-locked emergency refund|
+| Mechanical Motor Failure     | bottle fails to drop     | triggers if hardware fails  |
+|                              |                          | to confirm within 180s.     |
++------------------------------+--------------------------+-----------------------------+
+| Spoofed Hardware Signer      | Attacker pretends bottle | Machine PDA binds hardware  |
+|                              | was dropped to steal RWA | public key; verified on-    |
+|                              |                          | chain via Signer check.     |
++------------------------------+--------------------------+-----------------------------+
+| Phantom Inventory Claim      | Rolling on empty slot    | Dynamic cumulative weight   |
+|                              |                          | recalculation ignoring slots|
+|                              |                          | where remaining_stock == 0. |
++------------------------------+--------------------------+-----------------------------+

@@ -1,0 +1,63 @@
+flowchart TD
+    subgraph ClientLayer ["1. Client & Creator Layer"]
+        UA["User / Creator App (Mobile/Web)"]
+        CAM["4K Dual-Angle Rig (Reel + Dispense Bay)"]
+    end
+
+    subgraph SolanaState ["2. Solana Program Layer (baxus_vending)"]
+        MS["Machine State PDA<br/>seeds: ['machine', machine_id]"]
+        IV["Inventory Vault PDA<br/>seeds: ['inventory', machine_id, slot_id]"]
+        ST["Spin Ticket PDA<br/>seeds: ['spin', machine_id, spin_count]"]
+        ESC["USDC / Escrow Vault PDA<br/>seeds: ['escrow', machine_id]"]
+        
+        IX_INIT["initialize_machine()"]
+        IX_STOCK["stock_inventory_slot()"]
+        IX_COMMIT["commit_spin()"]
+        IX_SETTLE["settle_spin()"]
+        IX_CONFIRM["confirm_dispense()"]
+        IX_REFUND["emergency_refund_timeout()"]
+    end
+
+    subgraph EntropyEngine ["3. Verifiable Entropy Layer"]
+        PRNG["Entropy Resolver<br/>(Commit-Reveal + Slot Hashes)"]
+    end
+
+    subgraph PhysicalMachine ["4. BAXUS Physical Vending Machine (IoT Edge)"]
+        EDGE["Edge Controller (Raspberry Pi 5 / Secure TPM)"]
+        RELAY["Relay / Motor Controller (Stepper Motor Coils)"]
+        SENS["Optical Beam Break Sensor (Drop Detection)"]
+        ENC["Hardware H264/H265 Video Encoder"]
+    end
+
+    subgraph StoragePipeline ["5. Decentralized Media Pipeline"]
+        IPFS["Shadow Drive / Arweave Bundler"]
+        NFT["Metaplex Core RWA Receipt NFT"]
+    end
+
+    %% Execution Flows
+    UA -->|"1. commit_spin(token_amount, user_hash)"| IX_COMMIT
+    IX_COMMIT -->|"Transfer SPL/USDC"| ESC
+    IX_COMMIT -->|"Allocate Ticket"| ST
+
+    UA -->|"2. settle_spin(reveal_secret)"| IX_SETTLE
+    ST -->|"Load Commit"| IX_SETTLE
+    PRNG -->|"Derive Randomness"| IX_SETTLE
+    IX_SETTLE -->|"Update Stock Count"| IV
+    IX_SETTLE -->|"Emit SpinSettledEvent"| EDGE
+
+    EDGE -->|"3. WebSocket Listen (SpinSettledEvent)"| RELAY
+    RELAY -->|"4. Pulse Coil Motor"| SENS
+    SENS -->|"5. Beam Interrupted (Bottle Dropped)"| EDGE
+    
+    EDGE -->|"6. confirm_dispense(signature, hardware_ts)"| IX_CONFIRM
+    IX_CONFIRM -->|"Mark Ticket Dispensed"| ST
+    IX_CONFIRM -->|"Mint / Unlock Bottle NFT"| NFT
+
+    CAM -->|"Raw Video Stream"| ENC
+    EDGE -->|"Inject TX Sig & Seed Overlay"| ENC
+    ENC -->|"7. Upload Verified Creator Video"| IPFS
+    IPFS -->|"Video URI Metadata"| NFT
+
+    %% Error / Fallback
+    EDGE -.->|"Jam / Drop Failure"| IX_REFUND
+    IX_REFUND -.->|"Refund Escrow to User"| ESC

@@ -1,0 +1,8 @@
++------------------+         +------------------+         +--------------------+
+       |   User Mobile    |  USDC   |  BAXUS Anchor    | Pyth /  |   Physical IoT     |
+       |  (Creator App)   |-------->| Vending Contract | Entropy | Hardware Dispenser |
+       |                  |         |  (Solana Core)   |-------->|   (Stepper/Cam)    |
+       +------------------+         +------------------+         +--------------------+
+                |                            |                             |
+                |                            v                             |
+                +------------------- Provably Fair Win --------------------+
