@@ -1,0 +1,10 @@
+{
+  "instruction": "confirmDispense",
+  "program": "BXSVnd1111111111111111111111111111111111111",
+  "data": {
+    "slotIndex": 0,
+    "telemetryHash": "0a87f1c9...31f2"
+  },
+  "status": "Finalized",
+  "computeUnitsConsumed": 14782
+}

@@ -1,0 +1,7 @@
+RPC_URL=https://api.devnet.solana.com
+WS_URL=wss://api.devnet.solana.com
+HARDWARE_KEYPAIR_PATH=/etc/baxus/hardware-keypair.json
+PROGRAM_ID=BXSVend1111111111111111111111111111111111111
+MACHINE_ID=42
+RTSP_CAMERA_URL=rtsp://admin:securepass@192.168.1.120:554/stream1
+PINATA_JWT=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...

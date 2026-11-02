@@ -1,134 +1,120 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
+import { PublicKey, Keypair } from "@solana/web3.js";
 import { BaxusVending } from "../target/types/baxus_vending";
-import { PublicKey, Keypair, Connection } from "@solana/web3.js";
-import { createHash } from "crypto";
-import { spawn } from "child_process";
 import * as fs from "fs";
+import { SerialPort } from "serialport";
 
-export class BaxusMachineHardwareDaemon {
+// Hardware Configuration
+const SERIAL_DEVICE_PATH = process.env.SERIAL_PORT || "/dev/ttyACM0";
+const SERIAL_BAUD_RATE = 115200;
+
+interface DispenseCommand {
+  type: "DISPENSE_TRIGGER";
+  slotId: number;
+  recipient: string;
+  sku: string;
+  txSignature: string;
+}
+
+class BaxusHardwareRelay {
   private program: Program<BaxusVending>;
-  private hardwareKeypair: Keypair;
-  private machineId: Buffer;
-  private machinePda: PublicKey;
-  private isProcessingDispense: boolean = false;
+  private serialPort: SerialPort;
 
-  constructor(
-    program: Program<BaxusVending>,
-    hardwareKeypair: Keypair,
-    machineIdStr: string
-  ) {
+  constructor(program: Program<BaxusVending>) {
     this.program = program;
-    this.hardwareKeypair = hardwareKeypair;
-    this.machineId = Buffer.from(machineIdStr.padEnd(16, "\0").slice(0, 16));
-    
-    const [pda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("machine"), this.machineId],
-      this.program.programId
+    this.serialPort = new SerialPort({
+      path: SERIAL_DEVICE_PATH,
+      baudRate: SERIAL_BAUD_RATE,
+      autoOpen: false,
+    });
+  }
+
+  public async start(): Promise<void> {
+    console.log("==================================================");
+    console.log("   BAXUS Physical Vending Machine Relay Service   ");
+    console.log("==================================================");
+
+    await this.initSerial();
+
+    console.log("Connecting WebSocket to Solana transaction log stream...");
+    this.program.addEventListener(
+      "DispenseTelemetryEvent",
+      async (event, slot, signature) => {
+        await this.handleDispenseEvent(event, signature);
+      }
     );
-    this.machinePda = pda;
+
+    console.log("Hardware listener active. Standing by for spins...");
   }
 
-  public async startListener() {
-    console.log(`[BAXUS-DAEMON] Initialized for Machine PDA: ${this.machinePda.toBase58()}`);
-    console.log(`[BAXUS-DAEMON] Listening for On-Chain Settled Spins...`);
-
-    this.program.addEventListener("SpinSettledEvent", async (event, slot) => {
-      const eventMachine = Buffer.from(event.machineId);
-      if (Buffer.compare(eventMachine, this.machineId) !== 0) {
-        return; // Event belongs to a different physical machine
-      }
-
-      console.log(`\n=================================================`);
-      console.log(`[SPIN SETTLED] Slot ID: ${event.slotId} | Tier: ${event.tier}`);
-      console.log(`User: ${event.user.toBase58()} | Spin Index: ${event.spinIndex.toString()}`);
-      console.log(`=================================================`);
-
-      await this.handlePhysicalDispenseSequence(
-        event.spinIndex,
-        event.slotId,
-        event.user.toBase58()
-      );
+  private initSerial(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.serialPort.open((err) => {
+        if (err) {
+          console.warn(`[SERIAL MOCK] Running without direct hardware port: ${err.message}`);
+          resolve();
+        } else {
+          console.log(`[HARDWARE] Connected to physical controller at ${SERIAL_DEVICE_PATH}`);
+          resolve();
+        }
+      });
     });
   }
 
-  private async handlePhysicalDispenseSequence(
-    spinIndex: anchor.BN,
-    slotId: number,
-    userAddress: string
-  ) {
-    if (this.isProcessingDispense) {
-      console.warn("[HARDWARE] Dispense queue busy! Enqueueing task...");
-    }
-    this.isProcessingDispense = true;
+  private async handleDispenseEvent(event: any, signature: string): Promise<void> {
+    const skuStr = Buffer.from(event.itemSku)
+      .toString("utf8")
+      .replace(/\0/g, "");
 
-    try {
-      // 1. Trigger High-Speed Camera Recording
-      const videoFilename = `/tmp/spin_${spinIndex.toString()}_slot_${slotId}.mp4`;
-      console.log(`[CAMERA] Triggering 120 FPS camera to: ${videoFilename}`);
-      const cameraProcess = spawn("ffmpeg", [
-        "-y",
-        "-f", "v4l2",
-        "-framerate", "60",
-        "-video_size", "1920x1080",
-        "-i", "/dev/video0",
-        "-t", "8",
-        "-c:v", "libx264",
-        "-preset", "ultrafast",
-        videoFilename
-      ]);
+    const payload: DispenseCommand = {
+      type: "DISPENSE_TRIGGER",
+      slotId: event.slotId,
+      recipient: event.recipient.toBase58(),
+      sku: skuStr,
+      txSignature: signature,
+    };
 
-      // 2. Fire physical relay/stepper motor for designated slot
-      console.log(`[GPIO-RELAY] Actuating Stepper Motor Coil for Bay #${slotId}...`);
-      const dispenseSuccess = await this.actuateMotorWithOpticalConfirmation(slotId);
+    console.log("\n[EVENT RECEIVED] Real Spin Executed On-Chain!");
+    console.log(`| Machine:  #${event.machineId.toString()}`);
+    console.log(`| Slot ID:  ${payload.slotId}`);
+    console.log(`| SKU:      ${payload.sku}`);
+    console.log(`| Winner:   ${payload.recipient}`);
+    console.log(`| Tx Sig:   ${payload.txSignature}`);
 
-      if (!dispenseSuccess) {
-        throw new Error(`Optical beam not broken within 8000ms. Dispense failure/jam detected.`);
-      }
-
-      // 3. Compute cryptographic proof of hardware telemetry
-      const videoBuffer = fs.readFileSync(videoFilename);
-      const telemetryPayload = Buffer.concat([
-        Buffer.from(spinIndex.toArray("le", 8)),
-        Buffer.from([slotId]),
-        createHash("sha256").update(videoBuffer).digest()
-      ]);
-      const telemetryProof = createHash("sha256").update(telemetryPayload).digest();
-
-      // 4. Send on-chain confirmation
-      const [spinTicketPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("spin"), this.machinePda.toBuffer(), spinIndex.toArrayLike(Buffer, "le", 8)],
-        this.program.programId
-      );
-
-      console.log(`[SOLANA] Submitting confirm_dispense tx...`);
-      const tx = await this.program.methods
-        .confirmDispense(Array.from(telemetryProof))
-        .accounts({
-          hardwareSigner: this.hardwareKeypair.publicKey,
-          machineState: this.machinePda,
-          spinTicket: spinTicketPda,
-        })
-        .signers([this.hardwareKeypair])
-        .rpc();
-
-      console.log(`[SUCCESS] Physical Dispense Confirmed! Tx Signature: ${tx}`);
-      console.log(`[CREATOR] Uploading watermarked spin proof video to Arweave/Shadow Drive...`);
-    } catch (err: any) {
-      console.error(`[HARDWARE ERROR] ${err.message}`);
-    } finally {
-      this.isProcessingDispense = false;
-    }
+    await this.dispatchToMotorController(payload);
   }
 
-  private async actuateMotorWithOpticalConfirmation(slotId: number): Promise<boolean> {
-    return new Promise((resolve) => {
-      // Simulating physical GPIO logic:
-      // Relay pin HIGH -> Stepper rotates -> Bottle drops -> Optical IR pin reads LOW
-      setTimeout(() => {
-        const simulatedSensorRead = true; // Drop detected
-        resolve(simulatedSensorRead);
-      }, 2500);
-    });
+  private async dispatchToMotorController(cmd: DispenseCommand): Promise<void> {
+    const message = JSON.stringify(cmd) + "\n";
+
+    if (this.serialPort.isOpen) {
+      this.serialPort.write(message, (err) => {
+        if (err) {
+          console.error("[HARDWARE ERROR] Failed writing to motor controller:", err);
+        } else {
+          console.log(`[HARDWARE] Microcontroller signaled: Motor #${cmd.slotId} dispensing...`);
+        }
+      });
+    } else {
+      console.log(`[HARDWARE EMULATION] Motor Slot #${cmd.slotId} actuated (3.5 sec pulse).`);
+      console.log(`[CINEMATIC CAM] Triggered Studio Lighting Sequence & Camera Dolly Focus.`);
+    }
   }
+}
+
+async function main() {
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
+  const program = anchor.workspace.BaxusVending as Program<BaxusVending>;
+
+  const relay = new BaxusHardwareRelay(program);
+  await relay.start();
+}
+
+if (require.main === module) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }

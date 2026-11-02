@@ -1,0 +1,24 @@
+[00:00 - 00:20] Hook & Problem Statement
+- Visual: Camera zooms in on the physical BAXUS custom vending machine glowing with LED strips, filled with authenticated bottles of allocated bourbon and scotch.
+- Speaker (Voiceover): 
+  "Traditional vending machines are black boxes. In Web3, drops are often manipulated by front-running bots. Today, we are unveiling the BAXUS Smart Vending Machine Protocol on Solana: the world's first hardware-integrated, provably fair RWA bottle dispenser with on-chain Proof-of-Physical-Spin."
+
+[00:20 - 00:50] The On-Chain Architecture
+- Visual: Cut to screen recording of Solana Explorer and terminal. User presses 'SPIN' on the BAXUS Creator Mobile Web3 DApp. Transaction submits.
+- Speaker (Voiceover):
+  "When a creator spins, they trigger our commit_spin instruction. Notice the two-phase entropy design: the creator's wallet submits a 32-byte client seed alongside the fee. Randomness is immune to validator lookahead because resolution is locked to a future slot. Our Anchor program executes in under 65,000 Compute Units."
+
+[00:50 - 01:25] Real Physical Dispense & Hardware Oracle
+- Visual: Terminal triggers `resolve_spin`. Switchboard entropy satisfies the contract. The Solana event log flashes `SpinDispenseEvent`. Instantly, the high-speed camera cuts to the mechanical internal coil rotating. A sealed bottle of Michter's 10-Year Single Barrel drops smoothly onto the pneumatic retrieval tray.
+- Speaker (Voiceover):
+  "Watch the hardware bridge: the contract derives the winning tier and emits a cryptographic hardware actuation payload. Our IoT dispatcher triggers motor coil #3. The bottle drops, and simultaneously, the Metaplex RWA NFT transfers directly into the creator's Phantom wallet."
+
+[01:25 - 01:45] Proof-of-Physical-Spin (PoPS) Creator Registry
+- Visual: Creator lifts the bottle, points their phone camera at the machine's interactive QR terminal, and uploads the spin video.
+- Speaker (Voiceover):
+  "To win creator bounties, authenticity is paramount. The creator uploads the raw spin footage. Our protocol hashes the video and telemetry, permanently binding the IPFS CID to the SpinReceipt PDA on Solana via `record_creator_spin`. Zero fake claims. 100% verified physical lineage."
+
+[01:45 - 02:00] Conclusion & Winning Value Proposition
+- Visual: Creator holds the high-end bottle next to the machine's neon BAXUS crest with the transaction confirmation on screen.
+- Speaker (Voiceover):
+  "Provably fair odds, verifiable physical hardware settlement, and bulletproof creator attestations. This is how BAXUS brings physical luxury assets on-chain. Thank you."

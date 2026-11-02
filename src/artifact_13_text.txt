@@ -1,0 +1,3 @@
+[2024-03-29 14:15:02,110] INFO - BAXUS_VEND: Hardware relay connected on /dev/ttyUSB0
+[2024-03-29 14:15:03,420] INFO - BAXUS_VEND: Connecting to Solana WebSocket: wss://api.devnet.solana.com
+[2024-03-29 14:15:04,002] INFO - BAXUS_VEND: Listening for BAXUS DispenseTriggered events on program BXSVnd1111111111111111111111111111111111111...

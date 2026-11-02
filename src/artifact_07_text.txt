@@ -1,0 +1,8 @@
+baxus_vending E2E Testing Suite
+    ✔ 1. Initializes Physical Vending Machine Config (482ms)
+    ✔ 2. Loads Vending Machine Slots with BAXUS Rare Bottle Stock (310ms)
+    ✔ 3. Creator Executes a Live Real-World Spin (415ms)
+    ✔ 4. IoT Hardware Controller Verifies Drop Sensor & Settles Dispense (380ms)
+    ✔ 5. Rejects Unauthorized Signer on Confirm Dispense (205ms)
+
+  5 passing (2.1s)

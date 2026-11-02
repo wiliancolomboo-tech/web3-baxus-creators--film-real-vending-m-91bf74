@@ -1,0 +1,1 @@
+npx ts-node scripts/mock_vending_hardware.ts

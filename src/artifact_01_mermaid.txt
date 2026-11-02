@@ -1,0 +1,60 @@
+flowchart TD
+    %% Styling
+    classDef userClass fill:#1E293B,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC;
+    classDef programClass fill:#0F172A,stroke:#818CF8,stroke-width:2px,color:#F8FAFC;
+    classDef pdaClass fill:#1E1B4B,stroke:#A855F7,stroke-width:2px,color:#F8FAFC;
+    classDef hardwareClass fill:#14532D,stroke:#4ADE80,stroke-width:2px,color:#F8FAFC;
+    classDef verifierClass fill:#701A75,stroke:#F472B6,stroke-width:2px,color:#F8FAFC;
+
+    subgraph UserInteraction ["1. User & Mobile Creator App"]
+        U[User / Content Creator Wallet]:::userClass
+        CAM[4K 60FPS Camera / Rig]:::userClass
+    end
+
+    subgraph SolanaOnChain ["2. Solana On-Chain Program (Anchor)"]
+        PROG[BAXUS Vending Machine Program]:::programClass
+        VSTATE[Vending Machine Config PDA<br/>seeds=[b'machine', machine_id]]:::pdaClass
+        SPIN_STATE[Spin Session PDA<br/>seeds=[b'session', machine_id, session_counter]]:::pdaClass
+        ESCROW_VAULT[Token / USDC Escrow PDA<br/>seeds=[b'escrow', machine_id]]:::pdaClass
+        BOTTLE_REGISTRY[RWA Bottle Inventory PDA<br/>seeds=[b'bottle', machine_id, bottle_index]]:::pdaClass
+    end
+
+    subgraph PhysicalHardware ["3. Physical Vending Machine & IoT Rig"]
+        IOT[IoT Edge Controller<br/>ESP32 / Linux Industrial Gateway]:::hardwareClass
+        DROP_SENSOR[Time-of-Flight / IR Drop Sensor]:::hardwareClass
+        MOTOR[Stepper Motor / Spiral Coil Dispenser]:::hardwareClass
+        STATUS_LED[Visual Status LED Display / QR Display]:::hardwareClass
+    end
+
+    subgraph VerificationLayer ["4. Media & Oracle Attestation"]
+        ORACLE[BAXUS Attestation Keeper Service]:::verifierClass
+        IPFS[Decentralized Storage / IPFS Pinning]:::verifierClass
+    end
+
+    %% Flow of Interaction
+    U -->|1. Initialize Spin Tx: Pay Spin Fee| PROG
+    PROG -->|Transfer USDC / SOL| ESCROW_VAULT
+    PROG -->|Create & Lock| SPIN_STATE
+    PROG -->|Derive Bottle Tier & Index| BOTTLE_REGISTRY
+    SPIN_STATE -.->|Status: PendingDispense| STATUS_LED
+
+    STATUS_LED -->|Displays Tx Signature & Nonce| CAM
+    CAM -->|Records Spin Reel, Drop & LED Nonce| CAM
+
+    IOT -->|2. Poll WebSocket for Valid Spin Session| PROG
+    IOT -->|3. Trigger Stepper Pulse| MOTOR
+    MOTOR -->|Bottle Released into Chute| DROP_SENSOR
+    DROP_SENSOR -->|Hardware Drop Verified Interrupt| IOT
+
+    IOT -->|4. Pipe Telemetry Log + Video Stream| ORACLE
+    CAM -->|Uploads Raw MP4 Footage| ORACLE
+    ORACLE -->|Calculate Video Hash & Sensor Digest| IPFS
+    ORACLE -->|5. Invoke confirm_dispense(video_hash, ipfs_cid)| PROG
+
+    PROG -->|Validate Keeper Signer & Set Dispensed| SPIN_STATE
+    PROG -->|Release Escrow Funds to BAXUS Vault| ESCROW_VAULT
+    PROG -->|Transfer RWA Bottle NFT to User| U
+
+    %% Timeout Fallback
+    U -.->|If Timeout Expired & No Drop: claim_refund()| PROG
+    PROG -.->|Refund Locked Fee| U

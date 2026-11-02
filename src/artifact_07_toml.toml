@@ -1,0 +1,6 @@
+[programs.localnet]
+baxus_vending = "BaxusV1111111111111111111111111111111111111"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"

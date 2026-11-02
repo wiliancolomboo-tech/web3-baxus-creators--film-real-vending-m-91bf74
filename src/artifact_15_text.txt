@@ -1,0 +1,6 @@
+baxus_vending_machine
+    ✔ Initializes the BAXUS Vending Machine (184ms)
+    ✔ Loads inventory of high-value bottles into shelf tiers (245ms)
+    ✔ Executes a Provably Fair Spin Request, Reveal, and Physical Dispense (412ms)
+
+  3 passing (1s)

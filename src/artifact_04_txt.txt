@@ -1,0 +1,17 @@
++-----------------------------+------------------------------------+-------------------------------------------+
+| Attack Vector               | Critical Severity Impact           | Program Mitigation Architecture           |
++-----------------------------+------------------------------------+-------------------------------------------+
+| 1. Reentrancy / Double-Drop | Malicious contract drains escrow   | State transition to PendingPhysical       |
+|                             | by calling spin repeatedly.        | occurs BEFORE token transfer; Escrow PDA  |
+|                             |                                    | uses canonical bumps.                     |
+|                             |                                    |                                           |
+| 2. Spoofed Sensor Trigger   | Attacker forges hardware drop      | Restricted keeper oracle signer required; |
+|                             | without physical bottle delivery.  | IR pulse count > 0 checked on-chain.      |
+|                             |                                    |                                           |
+| 3. Mechanical Jam / Grief   | User funds locked forever if motor | Fallback `claim_refund` unlocks escrow    |
+|                             | jams or coil misses drop chute.    | after TIMEOUT_SLOT_DELTA (~150 slots).    |
+|                             |                                    |                                           |
+| 4. Video Attestation Tamper | Creator submits recycled footage   | Dynamic Nonce & Tx Hash required in LED   |
+|                             | of an earlier high-value bottle.   | frame; SHA-256 multihash verified on-chain|
+|                             |                                    | and permanently bound to session PDA.     |
++-----------------------------+------------------------------------+-------------------------------------------+

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BAXUS Live Vending HUD</title>
+  <style>
+    body {
+      margin: 0;
+      background: transparent;
+      font-family: 'Inter', -apple-system, sans-serif;
+      overflow: hidden;
+      color: #fff;
+    }
+    .hud-container {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      width: 360px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      backdrop-filter: blur(12px);
+    }
+    .brand-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .baxus-badge {
+      background: #F59E0B;
+      color: #000;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 1px;
+    }
+    .live-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #10B981;
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+    .status-text {
+      font-size: 14px;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .prize-display {
+      margin-top: 14px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .tier-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #F8FAFC;
+    }
+    .grail-win {
+      border: 2px solid #F59E0B;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
+      animation: flash 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes flash { from { box-shadow: 0 0 10px #F59E0B; } to { box-shadow: 0 0 30px #F59E0B; } }
+  </style>
+</head>
+<body>
+  <div class="hud-container" id="hud">
+    <div class="brand-header">
+      <span class="baxus-badge">BAXUS VENDING</span>
+      <div style="display:flex;align-items:center;">
+        <span class="live-dot"></span>
+        <span class="status-text" id="status-label">READY TO SPIN</span>
+      </div>
+    </div>
+    <div class="prize-display" id="prize-box">
+      <div style="font-size:12px;color:#94A3B8;letter-spacing:1px;">LAST RESULT</div>
+      <div class="tier-title" id="prize-name">TAP NFC TO PLAY</div>
+      <div id="user-display" style="font-size:11px;color:#64748B;margin-top:6px;">Waiting for wallet...</div>
+    </div>
+  </div>
+
+  <script>
+    const ws = new WebSocket("ws://localhost:8088");
+    const statusLabel = document.getElementById("status-label");
+    const prizeBox = document.getElementById("prize-box");
+    const prizeName = document.getElementById("prize-name");
+    const userDisplay = document.getElementById("user-display");
+
+    ws.onmessage = (event) => {
+      const payload = JSON.parse(event.data);
+      if (payload.event === "SPIN_TRIGGERED") {
+        statusLabel.innerText = "ROLLING...";
+        prizeName.innerText = "DETERMINING PRIZE...";
+        prizeBox.classList.remove("grail-win");
+      } else if (payload.event === "DISPENSE_SUCCESS") {
+        statusLabel.innerText = "DISPENSED!";
+        prizeName.innerText = "GRAIL: PAPPY VAN WINKLE 15Y";
+        prizeBox.classList.add("grail-win");
+        userDisplay.innerText = "Telemetry: " + payload.telemetryHash.slice(0, 16) + "...";
+      }
+    };
+  </script>
+</body>
+</html>

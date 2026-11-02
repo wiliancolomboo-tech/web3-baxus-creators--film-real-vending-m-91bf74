@@ -1,8 +1,20 @@
-+------------------+         +------------------+         +--------------------+
-       |   User Mobile    |  USDC   |  BAXUS Anchor    | Pyth /  |   Physical IoT     |
-       |  (Creator App)   |-------->| Vending Contract | Entropy | Hardware Dispenser |
-       |                  |         |  (Solana Core)   |-------->|   (Stepper/Cam)    |
-       +------------------+         +------------------+         +--------------------+
-                |                            |                             |
-                |                            v                             |
-                +------------------- Provably Fair Win --------------------+
+[User App / DApp]
+              │ (1) request_spin(seed)
+              ▼
+   ┌──────────────────────┐
+   │ Solana Anchor Program│◄─── [BAXUS Custodial Vault / Inventory PDA]
+   │  (Provable RNG Engine│
+   │   + Tier Rarity Map) │───► Emits DispenseEvent { spin_id, slot_id, user }
+   └──────────┬───────────┘
+              │ (2) Webhook / WebSocket Log Subscription
+              ▼
+   ┌──────────────────────┐      (3) Encrypted Hardware Dispatch (UART/MQTT)
+   │ Physical Relay Daemon│───────────────────────────────────────────────┐
+   │ (Rust / TypeScript)  │                                               │
+   └──────────────────────┘                                               ▼
+                                                                ┌───────────────────┐
+                                                                │ Physical BAXUS    │
+                                                                │ Vending Machine   │
+                                                                │ (Real-Life Spin & │
+                                                                │  Bottle Drop)     │
+                                                                └───────────────────┘

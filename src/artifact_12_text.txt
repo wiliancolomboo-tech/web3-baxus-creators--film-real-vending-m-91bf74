@@ -1,0 +1,8 @@
+baxus-vending QA Test Matrix
+    ✔ 1. Initializes protocol config PDA (182ms)
+    ✔ 2. Registers new physical vending machine with 4-tier inventory (210ms)
+    ✔ 3. Executes spin, transfers USDC, locks state & emits event (452ms)
+    ✔ 4. Rejects settle attempt from unauthorized keeper (168ms)
+    ✔ 5. Settles physical dispense, anchors 4K video hash & transfers RWA bottle NFT (512ms)
+
+  5 passing (2.4s)

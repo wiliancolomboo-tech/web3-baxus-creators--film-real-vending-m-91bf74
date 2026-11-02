@@ -1,5 +1,5 @@
-# Inspect initialized machine state PDA
-solana account <DERIVED_MACHINE_PDA> --output json-compact
+# 1. Start local Solana test validator
+solana-test-validator --reset --quiet &
 
-# Verify USDC balance in Escrow Vault PDA
-spl-token balance --address <ESCROW_VAULT_PDA>
+# 2. Run the full test suite against localnet
+anchor test --skip-local-validator

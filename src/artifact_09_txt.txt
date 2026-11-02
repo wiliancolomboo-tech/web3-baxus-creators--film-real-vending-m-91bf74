@@ -1,0 +1,9 @@
+[DAEMON] BAXUS IoT Keeper online. Monitoring Machine ID #42...
+[DAEMON] Subscribed to Solana RPC Program logs.
+[EVENT] New physical spin detected: Program BXSVnd... SpinCompletedEvent { machine_id: 42, ticket_id: 0, won_tier: 0 }
+[HARDWARE] Spinning physical slot for Tier 0 (Rare Pappy Van Winkle 15)
+[HARDWARE] Actuator firing: Opening physical solenoid gate...
+[HARDWARE] IR Sensor Beam Broken: Bottle confirmed physically dropped.
+[CAMERA] Video footage recorded: /var/baxus/recordings/spin_ticket_0.mp4
+[ARWEAVE] Uploaded proof hash: 7d2b512c9b4e3391b151a66270cf17c1bf86ec70cb0fa2ff345b1418b7625121
+[SOLANA] Attestation confirmed on-chain! Tx Signature: 4Z3xV7fW9K...

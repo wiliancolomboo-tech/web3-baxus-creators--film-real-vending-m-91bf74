@@ -1,0 +1,42 @@
+<!-- Save as creator_hud.html and add as OBS Browser Source -->
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: 'Courier New', monospace; background: transparent; color: #00FFA3; margin: 20px; }
+    .hud-panel { background: rgba(10, 10, 20, 0.85); border: 2px solid #00FFA3; border-radius: 8px; padding: 15px; width: 420px; }
+    .hud-title { color: #DC1FFF; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+    .hud-line { font-size: 13px; margin: 4px 0; }
+    .badge { background: #DC1FFF; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+  </style>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <div class="hud-panel">
+    <div class="hud-title">BAXUS ON-CHAIN VENDING ENGINE</div>
+    <div class="hud-line">STATUS: <span id="status" class="badge">AWAITING SPIN</span></div>
+    <div class="hud-line">SPIN ID: <span id="spin-id">--</span></div>
+    <div class="hud-line">PLAYER: <span id="player">--</span></div>
+    <div class="hud-line">PRIZE: <span id="prize">--</span></div>
+    <div class="hud-line">SLOT: <span id="slot">--</span></div>
+    <div class="hud-line">ENTROPY: <span id="hash">--</span></div>
+  </div>
+
+  <script>
+    const socket = io("http://localhost:9099");
+    socket.on("telemetry_update", (data) => {
+      document.getElementById("status").innerText = "DISPENSING...";
+      document.getElementById("spin-id").innerText = "#" + data.spinId;
+      document.getElementById("player").innerText = data.userAddress.slice(0, 6) + "..." + data.userAddress.slice(-4);
+      document.getElementById("prize").innerText = data.tierName;
+      document.getElementById("slot").innerText = data.slot;
+      document.getElementById("hash").innerText = data.txHash.slice(0, 14) + "...";
+    });
+    socket.on("dispense_success", (data) => {
+      document.getElementById("status").innerText = "CONFIRMED ON-CHAIN";
+      document.getElementById("status").style.background = "#00FFA3";
+      document.getElementById("status").style.color = "#000";
+    });
+  </script>
+</body>
+</html>

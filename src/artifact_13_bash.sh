@@ -1,0 +1,1 @@
+yarn ts-node scripts/trigger-demo-spin.ts --machine-id 888 --amount 50

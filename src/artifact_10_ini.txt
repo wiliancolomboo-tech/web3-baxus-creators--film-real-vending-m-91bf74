@@ -1,0 +1,5 @@
+SOLANA_RPC_WS_URL=wss://api.devnet.solana.com
+   MACHINE_ID=8801
+   HARDWARE_KEYPAIR_PATH=/etc/baxus/hardware_auth.json
+   IR_BREAKBEAM_PIN=18
+   MOTOR_RELAY_PIN=23

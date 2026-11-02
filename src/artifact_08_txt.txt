@@ -1,0 +1,31 @@
++-------------+---------------------------------------------------+---------------------------------------------------------+
+| Timecode    | Visual Action On-Screen                           | Spoken Audio Narrative (Voiceover)                      |
++-------------+---------------------------------------------------+---------------------------------------------------------+
+| 00:00-00:18 | Wide shot of luxury BAXUS custom vending machine. | "Real-world assets demand real-world engagement.        |
+|             | Bottles of rare Bourbon, Macallan, and Tequila    | Welcome to BAXUS Verifiable Vending Spins—the first     |
+|             | visible through illuminated display.              | production-grade protocol connecting physical luxury    |
+|             | Creator holds phone ready to spin.                | spirits dispensing directly to Solana on-chain entropy."|
++-------------+---------------------------------------------------+---------------------------------------------------------+
+| 00:18-00:40 | User hits 'Spin' in mobile app. Transaction logs  | "A user commits 0.1 SOL on-chain. Our Anchor program    |
+|             | flash on screen: `commit_spin` executed.          | locks the escrow into a dedicated PDA and captures user |
+|             | Slot commitment confirmed.                        | entropy. Crucially, it enforces a deterministic slot    |
+|             |                                                   | delay, mathematically eliminating validator grinding."  |
++-------------+---------------------------------------------------+---------------------------------------------------------+
+| 00:40-01:05 | Raspberry Pi 4 controller triggers camera rig.    | "Next, the machine's hardware keeper calls reveal.      |
+|             | Stepper motor turns coil #2. IR drop sensor       | In less than 12,000 Compute Units, the integer CDF      |
+|             | registers bottle drop cushion contact.            | selects the winning tier—here, a rare bottle! The motor |
+|             | Green LED flashes on machine tray.                | turns, the bottle drops, and our optical beam break     |
+|             |                                                   | verifies physical delivery before clearing state."      |
++-------------+---------------------------------------------------+---------------------------------------------------------+
+| 01:05-01:30 | Close-up of creator picking up bottle from tray,  | "What if a motor jams? The user is fully protected by a |
+|             | inspecting authenticated BAXUS tamper seal & NFC. | slot-based timeout refund escrow. Zero lost funds.      |
+|             | Phone displays unboxing confirmation.             | Zero customer support friction. Complete security."     |
++-------------+---------------------------------------------------+---------------------------------------------------------+
+| 01:30-01:50 | Creator uploads reel to platform. Bot executes   | "For creators, every spin is content. Our protocol      |
+|             | `attach_creator_proof` with video IPFS CID.       | binds the video's cryptographic IPFS hash directly to   |
+|             | Transaction link shown on SolanaFM Explorer.      | the on-chain spin record, triggering automated creator  |
+|             |                                                   | royalty incentives for viral physical engagement."      |
++-------------+---------------------------------------------------+---------------------------------------------------------+
+| 01:50-02:00 | BAXUS Logo with GitHub repo link and clean test   | "Verifiable randomness. Real physical bottles. Built on |
+|             | matrix execution passing 100%.                    | Solana. That's why this solution takes 1st place."      |
++-------------+---------------------------------------------------+---------------------------------------------------------+

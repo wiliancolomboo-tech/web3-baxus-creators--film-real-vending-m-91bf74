@@ -1,0 +1,16 @@
+baxus-vending-machine/
+├── Anchor.toml
+├── Cargo.toml
+├── programs/
+│   └── baxus-vending-machine/
+│       ├── Cargo.toml
+│       └── src/
+│           ├── errors.rs
+│           ├── state.rs
+│           └── lib.rs
+├── keeper/
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── dispenser_keeper.ts
+└── tests/
+    └── baxus-vending-machine.ts

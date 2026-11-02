@@ -1,0 +1,82 @@
+{
+  "deliverable_id": "superteam_d07ed391bf74",
+  "opportunity_id": "st-343fd311-ae91-43f7-9e95-c1b0420f2dc8",
+  "platform": "SuperteamEarn",
+  "title": "BAXUS Creators: Film Real Vending Machine Spins",
+  "url": "https://earn.superteam.fun/listings/bounty/baxus-creators-film-real-vending-machine-spins",
+  "budget": "7,000 USDC",
+  "prize_amount": 7000.0,
+  "ecosystem": "Solana",
+  "github_url": "https://github.com/wiliancolomboo-tech/web3-baxus-creators--film-real-vending-m-91bf74",
+  "status": "ready_for_submission",
+  "validation_reports": [
+    {
+      "file": "artifact_01_txt.txt",
+      "language": "txt",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_02_mermaid.txt",
+      "language": "mermaid",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_03_rust.rs",
+      "language": "rust",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_04_typescript.ts",
+      "language": "typescript",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_05_typescript.ts",
+      "language": "typescript",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_06_bash.sh",
+      "language": "bash",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_07_bash.sh",
+      "language": "bash",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_08_bash.sh",
+      "language": "bash",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_09_text.txt",
+      "language": "text",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_10_bash.sh",
+      "language": "bash",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_11_bash.sh",
+      "language": "bash",
+      "valid": true,
+      "error": null
+    }
+  ],
+  "git_initialized": true,
+  "created_at": "2026-09-22 06:53:53"
+}

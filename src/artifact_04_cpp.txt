@@ -1,0 +1,69 @@
+#include <Arduino.h>
+
+#define NUM_TIERS 5
+const int SOLENOID_PINS[NUM_TIERS] = {16, 17, 18, 19, 21};
+#define BREAK_BEAM_PIN 22
+#define STATUS_LED_PIN 2
+#define SOLENOID_PULSE_MS 450
+#define DROP_TIMEOUT_MS 5000
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(BREAK_BEAM_PIN, INPUT_PULLUP);
+  pinMode(STATUS_LED_PIN, OUTPUT);
+  digitalWrite(STATUS_LED_PIN, LOW);
+
+  for (int i = 0; i < NUM_TIERS; i++) {
+    pinMode(SOLENOID_PINS[i], OUTPUT);
+    digitalWrite(SOLENOID_PINS[i], LOW);
+  }
+  Serial.println("BAXUS_HARDWARE_CONTROLLER_READY");
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    command.trim();
+
+    if (command.startsWith("FIRE_TIER:")) {
+      int tier = command.substring(10).toInt();
+      if (tier >= 0 && tier < NUM_TIERS) {
+        actuateAndVerifyDrop(tier);
+      } else {
+        Serial.println("ERR:INVALID_TIER");
+      }
+    }
+  }
+}
+
+void actuateAndVerifyDrop(int tier) {
+  digitalWrite(STATUS_LED_PIN, HIGH);
+  Serial.print("ACTUATING_TIER_SOLENOID:");
+  Serial.println(tier);
+
+  // Pulse designated solenoid
+  digitalWrite(SOLENOID_PINS[tier], HIGH);
+  delay(SOLENOID_PULSE_MS);
+  digitalWrite(SOLENOID_PINS[tier], LOW);
+
+  // Await break-beam drop confirmation
+  unsigned long startWait = millis();
+  bool dropDetected = false;
+
+  while (millis() - startWait < DROP_TIMEOUT_MS) {
+    // Break-beam reads LOW when bottle passes through the IR beam
+    if (digitalRead(BREAK_BEAM_PIN) == LOW) {
+      dropDetected = true;
+      break;
+    }
+    delay(10);
+  }
+
+  digitalWrite(STATUS_LED_PIN, LOW);
+
+  if (dropDetected) {
+    Serial.println("DROP_VERIFIED_SUCCESS");
+  } else {
+    Serial.println("ERR:DROP_TIMEOUT_JAM");
+  }
+}

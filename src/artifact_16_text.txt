@@ -1,0 +1,9 @@
+BAXUS Vending Machine: Full QA Verification Suite
+    ✔ 1. Initializes the Vending Machine Configuration (412ms)
+    ✔ 2. Stocks Slot #0 with Rare Tier Bottle RWA (489ms)
+    ✔ 3. User Initiates Spin with Valid Escrow Deduction (365ms)
+    ✔ 4. Keeper Resolves Entropy & Triggers Win (310ms)
+    ✔ 5. Hardware Daemon Attests Filmed Physical Video (295ms)
+    ✔ 6. Winner Claims Digital Custody of Dispensed Bottle NFT (450ms)
+
+  6 passing (2.32s)

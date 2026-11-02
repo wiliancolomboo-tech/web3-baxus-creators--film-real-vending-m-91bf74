@@ -1,0 +1,1 @@
+anchor deploy --provider.cluster mainnet --program-keypair <KEYPAIR>

@@ -1,0 +1,9 @@
+BAXUS Phygital Dispense Protocol Tests
+    ✔ 1. Initializes BAXUS Vending Machine with Hardware Key and Probabilities (182ms)
+    ✔ 2. User initiates spin, escrows 25 USDC into PDA Vault (214ms)
+    ✔ 3. Keeper resolves entropy and reveals winning tier (198ms)
+    ✔ 4. Rejects confirm_dispense from unauthorized non-hardware signer (88ms)
+    ✔ 5. Hardware IoT verifies physical drop & confirms dispense (165ms)
+    ✔ 6. Creator submits filmed video proof of the real spin (220ms)
+
+  6 passing (1.2s)

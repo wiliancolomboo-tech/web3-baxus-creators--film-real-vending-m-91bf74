@@ -1,276 +1,213 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
+import { PublicKey, Keypair, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { BaxusVending } from "../target/types/baxus_vending";
-import {
-  createMint,
-  createAccount,
-  mintTo,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
-import { Keypair, PublicKey, SYSVAR_SLOT_HASHES_PUBKEY } from "@solana/web3.js";
 import { expect } from "chai";
-import { createHash, randomBytes } from "crypto";
+import * as crypto from "crypto";
 
-describe("BAXUS Vending System: Provable Spins & Dispense", () => {
+describe("BAXUS Vending Machine End-to-End Suite", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
   const program = anchor.workspace.BaxusVending as Program<BaxusVending>;
 
   const admin = Keypair.generate();
-  const hardwareSigner = Keypair.generate();
   const user = Keypair.generate();
+  const keeper = Keypair.generate();
 
-  let paymentMint: PublicKey;
-  let userTokenAccount: PublicKey;
-  let machineStatePda: PublicKey;
-  let escrowVaultPda: PublicKey;
-
-  const machineIdRaw = "BAXUS_NYC_VEND01";
-  const machineId = Array.from(Buffer.from(machineIdRaw.padEnd(16, "\0")));
-  const spinPrice = new anchor.BN(25_000_000); // 25 USDC (6 decimals)
+  const machineId = new anchor.BN(42);
+  let machinePda: PublicKey;
+  let machineBump: number;
+  let treasuryPda: PublicKey;
+  let slot0Pda: PublicKey;
 
   before(async () => {
-    // Fund actors
-    for (const actor of [admin, hardwareSigner, user]) {
-      const sig = await provider.connection.requestAirdrop(actor.publicKey, 5 * anchor.web3.LAMPORTS_PER_SOL);
-      await provider.connection.confirmTransaction(sig);
-    }
+    // Fund test wallets
+    const airdropAdmin = await provider.connection.requestAirdrop(admin.publicKey, 5 * LAMPORTS_PER_SOL);
+    const airdropUser = await provider.connection.requestAirdrop(user.publicKey, 5 * LAMPORTS_PER_SOL);
+    const airdropKeeper = await provider.connection.requestAirdrop(keeper.publicKey, 2 * LAMPORTS_PER_SOL);
 
-    // Initialize USDC mock mint
-    paymentMint = await createMint(
-      provider.connection,
-      admin,
-      admin.publicKey,
-      null,
-      6
-    );
+    const latestBlock = await provider.connection.getLatestBlockhash();
+    await provider.connection.confirmTransaction({
+      signature: airdropAdmin,
+      ...latestBlock,
+    });
 
-    // Setup user token account and mint 200 USDC
-    userTokenAccount = await createAccount(
-      provider.connection,
-      user,
-      paymentMint,
-      user.publicKey
-    );
-    await mintTo(provider.connection, admin, paymentMint, userTokenAccount, admin, 200_000_000);
-
-    // Derive PDAs
-    [machineStatePda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("machine"), Buffer.from(machineId)],
+    [machinePda, machineBump] = PublicKey.findProgramAddressSync(
+      [Buffer.from("baxus_machine"), machineId.toArrayLike(Buffer, "le", 8)],
       program.programId
     );
 
-    [escrowVaultPda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("escrow"), Buffer.from(machineId)],
+    [treasuryPda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("baxus_treasury"), machinePda.toBuffer()],
+      program.programId
+    );
+
+    [slot0Pda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("baxus_slot"), machinePda.toBuffer(), Buffer.from([0])],
       program.programId
     );
   });
 
-  it("Initializes the Physical Machine Profile", async () => {
+  it("1. Initializes BAXUS Vending Machine Account", async () => {
     await program.methods
-      .initializeMachine(machineId, spinPrice, new anchor.BN(60))
+      .initializeMachine(machineId, machineBump)
       .accounts({
+        machine: machinePda,
         admin: admin.publicKey,
-        hardwareSigner: hardwareSigner.publicKey,
-        paymentMint: paymentMint,
-        machineState: machineStatePda,
-        escrowVault: escrowVaultPda,
-        systemProgram: anchor.web3.SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        systemProgram: SystemProgram.programId,
       })
       .signers([admin])
       .rpc();
 
-    const machineState = await program.account.machineState.fetch(machineStatePda);
-    expect(machineState.admin.toBase58()).to.equal(admin.publicKey.toBase58());
-    expect(machineState.hardwareSigner.toBase58()).to.equal(hardwareSigner.publicKey.toBase58());
-    expect(machineState.pricePerSpin.toNumber()).to.equal(25_000_000);
+    const machineAccount = await program.account.machineAccount.fetch(machinePda);
+    expect(machineAccount.machineId.toNumber()).to.equal(42);
+    expect(machineAccount.admin.toBase58()).to.equal(admin.publicKey.toBase58());
+    expect(machineAccount.activeSlots).to.equal(0);
+    expect(machineAccount.totalSpins.toNumber()).to.equal(0);
   });
 
-  it("Stocks Physical Slots with Tiered Bottles", async () => {
-    // Slot 0: Pappy Van Winkle 23yr (Tier 1: Rare - 500 bps = 5%)
-    // Slot 1: Blanton's Gold Edition (Tier 2: Premium - 2500 bps = 25%)
-    // Slot 2: WhistlePig 10yr Mini (Tier 3: Common - 7000 bps = 70%)
+  it("2. Configures Slot #0 with Rare Bourbon Bottle Stock", async () => {
+    const sku = Buffer.alloc(16);
+    sku.write("PAPPY-VAN-WNK-15");
 
-    const slotsConfig = [
-      { slotId: 0, qty: 1, weight: 500, tier: 1 },
-      { slotId: 1, qty: 5, weight: 2500, tier: 2 },
-      { slotId: 2, qty: 20, weight: 7000, tier: 3 },
-    ];
+    await program.methods
+      .configureSlot(0, Array.from(sku), 100, 5)
+      .accounts({
+        machine: machinePda,
+        slot: slot0Pda,
+        admin: admin.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .signers([admin])
+      .rpc();
 
-    for (const cfg of slotsConfig) {
-      const [slotPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("inventory"), machineStatePda.toBuffer(), Buffer.from([cfg.slotId])],
-        program.programId
-      );
+    const slotAccount = await program.account.slotAccount.fetch(slot0Pda);
+    expect(slotAccount.remainingStock).to.equal(5);
+    expect(slotAccount.slotId).to.equal(0);
 
-      const rwaId = randomBytes(32);
-
-      await program.methods
-        .stockInventorySlot(cfg.slotId, cfg.qty, cfg.weight, Array.from(rwaId), cfg.tier)
-        .accounts({
-          machineState: machineStatePda,
-          admin: admin.publicKey,
-          inventorySlot: slotPda,
-          systemProgram: anchor.web3.SystemProgram.programId,
-        })
-        .signers([admin])
-        .rpc();
-
-      const slotData = await program.account.inventorySlot.fetch(slotPda);
-      expect(slotData.remainingStock).to.equal(cfg.qty);
-      expect(slotData.weightBps).to.equal(cfg.weight);
-    }
+    const machineAccount = await program.account.machineAccount.fetch(machinePda);
+    expect(machineAccount.activeSlots).to.equal(1);
   });
 
-  it("Executes Complete 3-Phase Physical Spin: Commit -> Settle -> Dispense", async () => {
-    // Phase 1: User generates secret, hashes it, commits
-    const secret = randomBytes(32);
-    const commitment = createHash("sha256").update(secret).digest();
+  it("3. User triggers Spin Commitment and Escrows Payment", async () => {
+    const machineAccountBefore = await program.account.machineAccount.fetch(machinePda);
+    const spinIndex = machineAccountBefore.totalSpins;
 
-    const machineBefore = await program.account.machineState.fetch(machineStatePda);
-    const spinIndex = machineBefore.totalSpins;
-
-    const [spinTicketPda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("spin"), machineStatePda.toBuffer(), spinIndex.toArrayLike(Buffer, "le", 8)],
+    const [spinPda] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("baxus_spin"),
+        machinePda.toBuffer(),
+        user.publicKey.toBuffer(),
+        spinIndex.toArrayLike(Buffer, "le", 8),
+      ],
       program.programId
     );
 
+    const userEntropy = crypto.randomBytes(32);
+    const treasuryBalanceBefore = await provider.connection.getBalance(treasuryPda);
+
     await program.methods
-      .commitSpin(Array.from(commitment))
+      .requestSpin(Array.from(userEntropy))
       .accounts({
+        machine: machinePda,
+        spinRecord: spinPda,
         user: user.publicKey,
-        machineState: machineStatePda,
-        escrowVault: escrowVaultPda,
-        userTokenAccount: userTokenAccount,
-        spinTicket: spinTicketPda,
-        systemProgram: anchor.web3.SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
+        treasury: treasuryPda,
+        systemProgram: SystemProgram.programId,
       })
       .signers([user])
       .rpc();
 
-    let ticket = await program.account.spinTicket.fetch(spinTicketPda);
-    expect(ticket.status).to.deep.equal({ committed: {} });
+    const treasuryBalanceAfter = await provider.connection.getBalance(treasuryPda);
+    expect(treasuryBalanceAfter - treasuryBalanceBefore).to.equal(50_000_000);
 
-    // Wait 1 slot to satisfy `clock.slot > spin_ticket.committed_slot`
-    await new Promise((r) => setTimeout(r, 1000));
-
-    // Phase 2: Settle spin with reveal secret
-    const slot0Pda = PublicKey.findProgramAddressSync(
-      [Buffer.from("inventory"), machineStatePda.toBuffer(), Buffer.from([0])],
-      program.programId
-    )[0];
-    const slot1Pda = PublicKey.findProgramAddressSync(
-      [Buffer.from("inventory"), machineStatePda.toBuffer(), Buffer.from([1])],
-      program.programId
-    )[0];
-    const slot2Pda = PublicKey.findProgramAddressSync(
-      [Buffer.from("inventory"), machineStatePda.toBuffer(), Buffer.from([2])],
-      program.programId
-    )[0];
-
-    await program.methods
-      .settleSpin(Array.from(secret))
-      .accounts({
-        user: user.publicKey,
-        machineState: machineStatePda,
-        spinTicket: spinTicketPda,
-        recentSlothashes: SYSVAR_SLOT_HASHES_PUBKEY,
-      })
-      .remainingAccounts([
-        { pubkey: slot0Pda, isWritable: true, isSigner: false },
-        { pubkey: slot1Pda, isWritable: true, isSigner: false },
-        { pubkey: slot2Pda, isWritable: true, isSigner: false },
-      ])
-      .signers([user])
-      .rpc();
-
-    ticket = await program.account.spinTicket.fetch(spinTicketPda);
-    expect(ticket.status).to.deep.equal({ settledAwaitingDispense: {} });
-    console.log(`[TEST RESULT] Provably settled winning slot: ${ticket.wonSlot}`);
-
-    // Phase 3: Physical machine hardware confirms optical drop
-    const mockTelemetryProof = randomBytes(32);
-    await program.methods
-      .confirmDispense(Array.from(mockTelemetryProof))
-      .accounts({
-        hardwareSigner: hardwareSigner.publicKey,
-        machineState: machineStatePda,
-        spinTicket: spinTicketPda,
-      })
-      .signers([hardwareSigner])
-      .rpc();
-
-    ticket = await program.account.spinTicket.fetch(spinTicketPda);
-    expect(ticket.status).to.deep.equal({ dispensedSuccessfully: {} });
+    const spinRecord = await program.account.spinRecord.fetch(spinPda);
+    expect(spinRecord.user.toBase58()).to.equal(user.publicKey.toBase58());
+    expect(spinRecord.isSettled).to.be.false;
   });
 
-  it("Rejects Unauthorized Hardware Confirmation", async () => {
-    const maliciousImposter = Keypair.generate();
-    await provider.connection.requestAirdrop(maliciousImposter.publicKey, anchor.web3.LAMPORTS_PER_SOL);
+  it("4. Fails settlement if attempted in the same block (Anti-MEV guard)", async () => {
+    const machineAccount = await program.account.machineAccount.fetch(machinePda);
+    const spinIndex = machineAccount.totalSpins;
 
-    const secret = randomBytes(32);
-    const commitment = createHash("sha256").update(secret).digest();
-    const machine = await program.account.machineState.fetch(machineStatePda);
-    const spinIndex = machine.totalSpins;
-
-    const [spinTicketPda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("spin"), machineStatePda.toBuffer(), spinIndex.toArrayLike(Buffer, "le", 8)],
+    const [spinPda] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("baxus_spin"),
+        machinePda.toBuffer(),
+        user.publicKey.toBuffer(),
+        spinIndex.toArrayLike(Buffer, "le", 8),
+      ],
       program.programId
     );
 
-    // Commit
-    await program.methods
-      .commitSpin(Array.from(commitment))
-      .accounts({
-        user: user.publicKey,
-        machineState: machineStatePda,
-        escrowVault: escrowVaultPda,
-        userTokenAccount: userTokenAccount,
-        spinTicket: spinTicketPda,
-        systemProgram: anchor.web3.SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .signers([user])
-      .rpc();
+    const keeperEntropy = crypto.randomBytes(32);
 
-    await new Promise((r) => setTimeout(r, 1000));
-
-    // Settle
-    const slot2Pda = PublicKey.findProgramAddressSync(
-      [Buffer.from("inventory"), machineStatePda.toBuffer(), Buffer.from([2])],
-      program.programId
-    )[0];
-
-    await program.methods
-      .settleSpin(Array.from(secret))
-      .accounts({
-        user: user.publicKey,
-        machineState: machineStatePda,
-        spinTicket: spinTicketPda,
-        recentSlothashes: SYSVAR_SLOT_HASHES_PUBKEY,
-      })
-      .remainingAccounts([{ pubkey: slot2Pda, isWritable: true, isSigner: false }])
-      .signers([user])
-      .rpc();
-
-    // Imposter attempts to sign hardware confirmation
     try {
       await program.methods
-        .confirmDispense(Array.from(randomBytes(32)))
+        .settleSpin(Array.from(keeperEntropy))
         .accounts({
-          hardwareSigner: maliciousImposter.publicKey,
-          machineState: machineStatePda,
-          spinTicket: spinTicketPda,
+          machine: machinePda,
+          spinRecord: spinPda,
+          slot: slot0Pda,
+          keeper: keeper.publicKey,
         })
-        .signers([maliciousImposter])
+        .signers([keeper])
         .rpc();
-      expect.fail("Should have failed with UnauthorizedHardware");
+      expect.fail("Should have failed with BlockDelayNotMet error");
     } catch (err: any) {
-      expect(err.error.errorCode.code).to.equal("UnauthorizedHardware");
+      expect(err.error?.errorCode?.code || err.message).to.satisfy(
+        (code: string) => code.includes("BlockDelayNotMet") || code.includes("custom program error")
+      );
     }
+  });
+
+  it("5. Settles Spin successfully after block delay, decrements stock & emits telemetry", async () => {
+    // Advance block by performing empty transfer
+    await provider.connection.requestAirdrop(admin.publicKey, 1000);
+
+    const machineAccount = await program.account.machineAccount.fetch(machinePda);
+    const spinIndex = machineAccount.totalSpins;
+
+    const [spinPda] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("baxus_spin"),
+        machinePda.toBuffer(),
+        user.publicKey.toBuffer(),
+        spinIndex.toArrayLike(Buffer, "le", 8),
+      ],
+      program.programId
+    );
+
+    const keeperEntropy = crypto.randomBytes(32);
+
+    let eventEmitted = false;
+    const listenerId = program.addEventListener("DispenseTelemetryEvent", (event) => {
+      expect(event.slotId).to.equal(0);
+      expect(event.recipient.toBase58()).to.equal(user.publicKey.toBase58());
+      eventEmitted = true;
+    });
+
+    await program.methods
+      .settleSpin(Array.from(keeperEntropy))
+      .accounts({
+        machine: machinePda,
+        spinRecord: spinPda,
+        slot: slot0Pda,
+        keeper: keeper.publicKey,
+      })
+      .signers([keeper])
+      .rpc();
+
+    await new Promise((res) => setTimeout(res, 1000));
+    await program.removeEventListener(listenerId);
+
+    const slotAccountAfter = await program.account.slotAccount.fetch(slot0Pda);
+    expect(slotAccountAfter.remainingStock).to.equal(4);
+
+    const spinRecordAfter = await program.account.spinRecord.fetch(spinPda);
+    expect(spinRecordAfter.isSettled).to.be.true;
+    expect(spinRecordAfter.awardedSlotId).to.equal(0);
+    expect(eventEmitted).to.be.true;
   });
 });

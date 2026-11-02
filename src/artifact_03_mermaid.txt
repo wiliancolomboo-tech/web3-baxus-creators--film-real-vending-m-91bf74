@@ -1,0 +1,41 @@
+flowchart TD
+    subgraph ClientAndCreator["Client & Creator Layer"]
+        User["User / Attendee Mobile Wallet"]
+        Creator["Content Creator Camera Rig"]
+        IoT["Machine Hardware Controller (Raspberry Pi / ESP32)"]
+    end
+
+    subgraph ProgramBoundary["BAXUS Vending Machine Program (Anchor)"]
+        ConfigPDA["Machine Config PDA<br/>['vending_machine', machine_id]"]
+        InventoryPDA["Machine Inventory PDA<br/>['inventory', machine_id]"]
+        ReceiptPDA["Spin Receipt PDA<br/>['spin_receipt', machine_id, user, nonce]"]
+        EscrowVault["RWA Token Escrow Vault<br/>['vault_authority', machine_id]"]
+    end
+
+    subgraph ExternalPrograms["Solana Ecosystem / System Programs"]
+        TokenProg["SPL Token Program / Token-2022"]
+        SysProg["System Program"]
+        RentSys["Sysvar Rent / Slot Hashes"]
+    end
+
+    %% User Initiates Spin
+    User -- "1. request_spin(machine_id, nonce)" --> ConfigPDA
+    ConfigPDA -. "Deducts Fee (SOL/USDC/BAXUS)" .-> User
+    ConfigPDA -- "Creates & Locks" --> ReceiptPDA
+
+    %% Outcome Resolution
+    ReceiptPDA -- "2. resolve_spin(seed, slot_hashes)" --> InventoryPDA
+    InventoryPDA -- "Selects Tier & Slot" --> ReceiptPDA
+
+    %% Physical Hardware Loop
+    ReceiptPDA -. "Emits DispenseRequestedEvent" .-> IoT
+    Creator -. "Films Real-Time LED Reel & Drop" .-> IoT
+    IoT -- "Physical Conveyor / Servo Drop" --> OpticalSensor["IR Optical Drop Sensor"]
+    OpticalSensor -- "Pass: Bottle Dropped" --> IoT
+
+    %% Hardware Attestation
+    IoT -- "3. confirm_hardware_dispense(ed25519_sig)" --> ReceiptPDA
+    ReceiptPDA -- "CPI: Transfer RWA Token / Certificate" --> EscrowVault
+    EscrowVault -- "Transfer Ownership to Winner" --> User
+    ReceiptPDA -- "Emits SpinCompletedEvent (Creator Video Seed)" --> Creator
+    ReceiptPDA -- "Close Receipt & Reclaim Rent" --> User

@@ -1,0 +1,50 @@
+flowchart TD
+    subgraph Client ["Player & Creator Front-End"]
+        U["Collector / Spinner Wallet"]
+        UI["BAXUS Mobile / Web dApp"]
+    end
+
+    subgraph Solana ["Solana L1 Core Runtime"]
+        Prog["BAXUS Vending Program (Anchor)"]
+        MachPDA["Machine State PDA\n['vending_machine', machine_id]"]
+        TicketPDA["Spin Ticket PDA\n['spin_ticket', machine, user, ticket_id]"]
+        VaultPDA["NFT Escrow PDA\n['escrow_vault', machine, slot_index]"]
+        SplToken["SPL Token / Token-2022 Program"]
+        USDC["Payment Mint (USDC/SOL)"]
+    end
+
+    subgraph IoT ["Physical Vending Machine Edge Node (Raspberry Pi / Jetson)"]
+        Daemon["BAXUS Hardware Daemon"]
+        Relay["Relay Controller (GPIO / Industrial Bus)"]
+        CamA["Camera 1: Reel / Physical Spindle 60FPS"]
+        CamB["Camera 2: Bottle Drop Chute & Reaction"]
+        VideoEngine["FFmpeg Overlay & Render Pipeline"]
+    end
+
+    subgraph DecentralizedStorage ["Permanent Decentralized Storage"]
+        Arweave["Irys / Arweave Gateway"]
+    end
+
+    %% Flow of Execution
+    U -->|1. Sign & Submit init_spin_ticket| UI
+    UI -->|2. CPI Transfer Payment| Prog
+    Prog -->|3. Escrow USDC & Emit SpinInitiated| MachPDA
+    Prog -->|4. Initialize State| TicketPDA
+
+    U -->|5. Settle Spin with Entropy Reveal| Prog
+    Prog -->|6. Calculate Random Slot & Outcome| MachPDA
+    MachPDA -->|7. CPI Transfer Won NFT| SplToken
+    SplToken -->|8. Transfer NFT to Winner| U
+    Prog -->|9. Emit DispenseReady Event| Solana
+
+    Solana -.->|10. WebSocket WSS Log Subscription| Daemon
+    Daemon -->|11. Verify Ed25519 & PDA State| Daemon
+    Daemon -->|12. Actuate Dispense Coil| Relay
+    Daemon -->|13. Trigger Synchronized Recording| CamA
+    Daemon -->|13. Trigger Synchronized Recording| CamB
+    CamA -->|14. Raw Video Stream| VideoEngine
+    CamB -->|14. Raw Video Stream| VideoEngine
+    VideoEngine -->|15. Burn Tx Signature, Block Time & Asset Metadata| VideoEngine
+    VideoEngine -->|16. Upload Proof Video MP4| Arweave
+    Daemon -->|17. record_dispense_telemetry CPI| Prog
+    Prog -->|18. Store Video Hash in Ticket PDA| TicketPDA

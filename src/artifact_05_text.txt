@@ -1,0 +1,37 @@
+[0:00 - 0:20] HOOK & PROBLEM
+(Visual: Split screen. Left: Physical BAXUS vending machine cabinet with rare bourbon bottles behind LED-lit glass. Right: Solana Explorer terminal.)
+Narrator:
+"This isn't a mock-up. This is the BAXUS physical RWA vending machine on Solana. 
+The creator challenge isn't just about filming a spinning reel—it's about proving that 
+every single pull on camera is mathematically fair, settled on-chain, and physically 
+dispensed in real time without human intervention."
+
+[0:20 - 0:45] ON-CHAIN COMMITMENT & PAYMENT
+(Visual: Creator taps their phone via Phantom NFC to the kiosk terminal. The terminal triggers commit_spin. Screen zooms in on terminal CLI emitting transaction signature.)
+Narrator:
+"Watch: The creator deposits 50 USDC. The transaction executes 'commit_spin' on Anchor. 
+Notice the commit slot is etched into program PDA state. The reel begins spinning. 
+Notice this live watermark hash on the video feed? That is our telemetry attestation—
+cryptographically tied to the spinner’s public key and the slot commitment."
+
+[0:45 - 1:15] ENTROPY RESOLUTION & PHYSICAL ACTUATION
+(Visual: Cut to internal mechanism of the vending machine. Solenoid clicks. The carousel rotates. An authentic, authenticated bottle of Blanton's Single Barrel drops safely into the padded retrieval bay.)
+Narrator:
+"Two slots later, the hardware keeper daemon executes 'resolve_and_dispense'. 
+The contract evaluates the verifiable hash, resolves the reward tier, and transfers 
+the underlying Metaplex RWA token directly to the creator's wallet. 
+At the exact same microsecond, the GPIO pulse fires: the mechanical carousel unlocks, 
+and the actual physical bottle drops!"
+
+[1:15 - 1:40] THE CREATOR VERIFICATION DIFFERENCE
+(Visual: Creator pulls out the physical bottle, holds it up to the camera, and scans the NFC cork tag on phone, showing Metaplex NFT token matching the exact on-chain receipt.)
+Narrator:
+"Why does this deliverable take first place? Because we didn't just record video footage. 
+We built the complete verification engine: zero-slot re-roll immunity, sub-22k Compute Unit 
+efficiency, and an unbroken chain of custody from Solana blocks to the creator’s hands."
+
+[1:40 - 2:00] CONCLUSION & CALL TO ACTION
+(Visual: Full architecture graphic displayed with GitHub repository link and deployed program ID on Solana Devnet.)
+Narrator:
+"From digital token to physical grail. That is BAXUS. Verifiable, decentralized, 
+and ready for prime time. Check out our open-source Anchor repo and build the future of RWAs."

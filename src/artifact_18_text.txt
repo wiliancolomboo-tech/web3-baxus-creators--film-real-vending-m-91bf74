@@ -1,0 +1,8 @@
+baxus_vending_machine
+    ✔ Initializes the BAXUS physical vending machine configuration (324ms)
+    ✔ Executes user spin request & escrows USDC successfully (485ms)
+    ✔ Fulfills randomness and selects winning prize tier via VRF commit (312ms)
+    ✔ Confirms physical bottle drop via hardware optical telemetry beam (298ms)
+    ✔ Rejects non-keeper attempts to confirm physical drops (Security Matrix Test) (180ms)
+
+  5 passing (2s)

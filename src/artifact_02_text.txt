@@ -1,0 +1,16 @@
+baxus_vending_machine/
+├── Anchor.toml
+├── Cargo.toml
+└── programs/
+    └── baxus_vending_machine/
+        ├── Cargo.toml
+        └── src/
+            ├── errors.rs
+            ├── instructions/
+            │   ├── dispense_physical.rs
+            │   ├── initialize_machine.rs
+            │   ├── load_inventory.rs
+            │   ├── request_spin.rs
+            │   └── resolve_spin.rs
+            ├── state.rs
+            └── lib.rs

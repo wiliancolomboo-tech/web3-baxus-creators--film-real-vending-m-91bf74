@@ -1,21 +1,18 @@
-+---------------------------------------------------------------------------------------+
-|                               SECURITY GUARD MATRIX                                   |
-+------------------------------+--------------------------+-----------------------------+
-| Threat Vector                | Vulnerability Profile    | Defense Implementation      |
-+------------------------------+--------------------------+-----------------------------+
-| Slot Peeking / MEV Sandwich  | Validator looks ahead at | Enforced two-phase commit:  |
-|                              | randomness to bias wins  | settle must be slot > commit|
-|                              |                          | and <= commit + 250.        |
-+------------------------------+--------------------------+-----------------------------+
-| Physical Dispenser Jam /     | User funds locked if     | Time-locked emergency refund|
-| Mechanical Motor Failure     | bottle fails to drop     | triggers if hardware fails  |
-|                              |                          | to confirm within 180s.     |
-+------------------------------+--------------------------+-----------------------------+
-| Spoofed Hardware Signer      | Attacker pretends bottle | Machine PDA binds hardware  |
-|                              | was dropped to steal RWA | public key; verified on-    |
-|                              |                          | chain via Signer check.     |
-+------------------------------+--------------------------+-----------------------------+
-| Phantom Inventory Claim      | Rolling on empty slot    | Dynamic cumulative weight   |
-|                              |                          | recalculation ignoring slots|
-|                              |                          | where remaining_stock == 0. |
-+------------------------------+--------------------------+-----------------------------+
++--------------------------+-------------------------------------------------+----------------------------------------------------+
+| Vulnerability Vector     | Attack Scenario                                 | Implementation Defense                             |
++--------------------------+-------------------------------------------------+----------------------------------------------------+
+| Front-Running / MEV      | Validator inspects user spin tx and alters seed | Two-phase commit-reveal: user hash must precede    |
+|                          | to steal high-tier bottles                      | operator entropy reveal. Block-slot seed mixing.   |
++--------------------------+-------------------------------------------------+----------------------------------------------------+
+| Physical Dispense Fraud  | Rogue actor claims spin won without bottle drop | Hardware optical drop sensor must sign dispense    |
+|                          | to siphon inventory voucher                     | attestation using authorized Ed25519 controller key|
++--------------------------+-------------------------------------------------+----------------------------------------------------+
+| Double Dispense / Replay | Replaying identical spin nonce across machines  | Strict PDA seeds: [machine_id, user, nonce].       |
+|                          |                                                 | Initialization fails if session exists.            |
++--------------------------+-------------------------------------------------+----------------------------------------------------+
+| Sybil Creator Footage    | Creator submits arbitrary video for prize proof | State machine enforces `stage == Dispensed` and    |
+|                          | without real physical spin                      | links PDA directly to verified `spin_session` key. |
++--------------------------+-------------------------------------------------+----------------------------------------------------+
+| Probability Distortion   | Malicious operator configures >100% chance      | Strict invariant check: `sum(tier_chances) == 10000|
+|                          | leading to arithmetic wrap or guaranteed bust   | basis points` checked on initialization.           |
++--------------------------+-------------------------------------------------+----------------------------------------------------+

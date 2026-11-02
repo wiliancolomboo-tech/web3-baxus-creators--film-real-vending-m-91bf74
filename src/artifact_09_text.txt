@@ -1,0 +1,8 @@
+BAXUS Vending Machine End-to-End Suite
+    ✔ 1. Initializes BAXUS Vending Machine Account (182ms)
+    ✔ 2. Configures Slot #0 with Rare Bourbon Bottle Stock (210ms)
+    ✔ 3. User triggers Spin Commitment and Escrows Payment (205ms)
+    ✔ 4. Fails settlement if attempted in the same block (Anti-MEV guard) (85ms)
+    ✔ 5. Settles Spin successfully after block delay, decrements stock & emits telemetry (1120ms)
+
+  5 passing (2.4s)

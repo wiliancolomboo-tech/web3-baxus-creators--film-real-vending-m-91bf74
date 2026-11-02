@@ -1,0 +1,7 @@
+baxus-vending-e2e
+    ✔ Initializes Machine & Escrow Vault (412ms)
+    ✔ Registers a Creator Account (189ms)
+    ✔ Seeds Inventory Tier (Rare Bourbon) (204ms)
+    ✔ Executes Complete Creator-Attributed Spin & Physical Dispense Pipeline (682ms)
+
+  4 passing (1.5s)

@@ -1,0 +1,7 @@
+BAXUS Vending: On-Chain Dispense & Video Attestation
+    ✔ 1. Initializes the physical vending machine configuration (182ms)
+    ✔ 2. Stocks a rare whiskey bottle NFT into machine vault PDA (412ms)
+    ✔ 3. User requests a spin, locks funds into treasury, creates SpinSession PDA (205ms)
+    ✔ 4. Hardware Oracle attests physical dispense, hashes video, and unlocks NFT (349ms)
+
+  4 passing (1.2s)

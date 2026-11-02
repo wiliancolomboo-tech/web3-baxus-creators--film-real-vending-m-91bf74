@@ -1,0 +1,17 @@
+baxus-vending-machine/
+├── Anchor.toml
+├── Cargo.toml
+├── programs/
+│   └── baxus-vending-machine/
+│       ├── Cargo.toml
+│       └── src/
+│           ├── errors.rs
+│           ├── instructions/
+│           │   ├── initialize.rs
+│           │   ├── request_spin.rs
+│           │   ├── fulfill_spin.rs
+│           │   └── confirm_dispense.rs
+│           ├── state.rs
+│           └── lib.rs
+└── tests/
+    └── baxus-vending-machine.ts

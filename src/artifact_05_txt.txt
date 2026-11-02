@@ -1,0 +1,40 @@
+========================================================================================================================
+TIMESTAMP | AUDIO SCRIPT / NARRATION                              | VISUAL FOCUS / SCREENPLAY
+========================================================================================================================
+00:00-00:15 | "What you are looking at is the world’s first        | Wide shot: Neon-lit BAXUS Physical Spirits
+            |  provably fair, vault-backed physical spirits        | Vending Machine. Creator approaches with 
+            |  vending machine on Solana. In the next two minutes, | phone wallet. OLED screen glows: 'READY TO SPIN'.
+            |  we aren't just filming a spin—we are proving the    |
+            |  exact cryptographic link between on-chain code and  |
+            |  physical mechanical release."                       |
+------------------------------------------------------------------------------------------------------------------------
+00:15-00:35 | "I tap 'SPIN' on the BAXUS mobile kiosk app. 50 USDC | Over-the-shoulder shot: App initiates transaction.
+            |  is transferred directly into our program's escrow   | Terminal on right shows Solana slot confirmation.
+            |  PDA. In slot 2841021, the machine registers the     | The machine OLED displays: 
+            |  transaction signature, displays our unique nonce on | "TX: 4vK8...9qL | NONCE: #0042".
+            |  the machine's OLED panel, and fires the mechanical  | 
+            |  motor reel."                                        |
+------------------------------------------------------------------------------------------------------------------------
+00:35-00:55 | "Watch the spiral coil rotate. We're capturing this  | Tight 60 FPS macro shot: The spiral coil pushes a
+            |  at 4K 60 frames per second. As the rare allocated   | bottle of Japanese Single Malt toward the ledge.
+            |  whisky drops through the chute, dual infrared       | Bottle falls through IR sensors; green LED flash
+            |  beams detect the velocity and break, confirming     | indicates hardware sensor trigger.
+            |  dispense to our ESP32 industrial keeper."           |
+------------------------------------------------------------------------------------------------------------------------
+00:55-01:25 | "The edge keeper doesn't just dispense—it anchors.   | Screen split: Camera footage finishes encoding.
+            |  Our keeper computes a SHA-256 checksum of this raw  | Terminal displays:
+            |  continuous video feed, matches the visible OLED     | "Video SHA256: e3b0c44298fc1c149afbf4c8996fb924..."
+            |  nonce, and signs the confirm_dispense instruction   | Keeper signs transaction on Solana mainnet-beta.
+            |  on Solana. Escrow funds unlock to the BAXUS vault,  | 
+            |  and the RWA bottle NFT is delivered to my wallet."  |
+------------------------------------------------------------------------------------------------------------------------
+01:25-01:45 | "If the machine jammed, our deterministic slot       | Graphic overlay of the Anchor code state machine
+            |  timeout guarantees a 100% automated refund. No      | demonstrating the `claim_refund` fallback guard.
+            |  disputes, no centralized operator intervention,     | Creator pulls physical bottle out of the chute
+            |  and zero trust required."                           | and scans the physical tamper-evident BAXUS NFC tag.
+------------------------------------------------------------------------------------------------------------------------
+01:45-02:00 | "This is how physical luxury assets meet Solana      | Final hero shot: Creator holds high-value bottle 
+            |  speed. Provable randomness, real hardware telemetry,| with on-chain Solscan transaction proof displayed 
+            |  and cryptographic video attestation. This is BAXUS. | on screen. Fade to black with GitHub & contract links.
+            |  Thank you."                                         |
+========================================================================================================================

@@ -1,0 +1,23 @@
+SECURITY AUDIT MATRIX
+┌──────────────────────────────┬──────────────────────────────┬──────────────────────────────────┐
+│ Vulnerability Vector         │ Potential Severity           │ Program Mitigation Implementation │
+├──────────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Frontrunning / Mempool Sniff │ CRITICAL                     │ Two-phase commit-reveal:         │
+│                              │                              │ User commits seed in slot N;     │
+│                              │                              │ Oracle entropy revealed in N+1.  │
+├──────────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Hardware Dispense Spoofing   │ HIGH                         │ `claim_dispense` strictly        │
+│                              │                              │ checks `dispenser_signer` equals │
+│                              │                              │ registered `dispenser_pubkey`.   │
+├──────────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Video Provenance Replay      │ HIGH                         │ `VideoProvenance` derived with   │
+│                              │                              │ seed `[b"video_proof", receipt]`;│
+│                              │                              │ enforces 1:1 video-to-spin rule. │
+├──────────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Reentrancy on Dispense       │ CRITICAL                     │ State changes immediately to     │
+│                              │                              │ `SpinStatus::Dispensed` before   │
+│                              │                              │ releasing any token or bottle.   │
+├──────────────────────────────┼──────────────────────────────┼──────────────────────────────────┤
+│ Arbitrary Token Injection    │ MEDIUM                       │ PDA Fee Vault strictly verifies  │
+│                              │                              │ `config.payment_mint` equality.  │
+└──────────────────────────────┴──────────────────────────────┴──────────────────────────────────┘

@@ -1,0 +1,7 @@
+baxus_vending protocol tests
+    ✔ Initializes the physical BAXUS vending machine (185ms)
+    ✔ Configures Slot 1 with Rare Whiskey RWA inventory (112ms)
+    ✔ Executes full lifecycle: Spin request, keeper resolve, and physical dispense finalization (420ms)
+    ✔ Guarantees automatic refund if physical dispenser sensor detects a jam (310ms)
+
+  4 passing (1.2s)

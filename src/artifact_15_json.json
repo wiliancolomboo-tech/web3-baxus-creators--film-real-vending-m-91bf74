@@ -1,0 +1,9 @@
+{
+  "account": {
+    "data": ["base64_encoded_state...", "base64"],
+    "executable": false,
+    "lamports": 1461600,
+    "owner": "BXSVnd1111111111111111111111111111111111111",
+    "rentEpoch": 361
+  }
+}

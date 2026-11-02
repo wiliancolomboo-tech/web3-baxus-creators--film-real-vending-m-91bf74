@@ -1,0 +1,11 @@
+BAXUS Vending Protocol Verification Test Matrix
+    ✔ 1. Initializes the Global Protocol Configuration (142ms)
+    ✔ 2. Registers Machine with Exact 10,000 BPS Tier Distribution (108ms)
+    ✔ 3. Enforces Security: Rejects Machine Registration with Invalid BPS Sum (74ms)
+    ✔ 4. Creator Commits a Spin (Deducts SOL Fee into Vault PDA) (195ms)
+    ✔ 5. Settles Spin Across Slots using Verifiable Entropy Seed (1028ms)
+    ✔ 6. Hardware Authenticator Confirms Physical Bottle Dispense (112ms)
+    ✔ 7. Enforces Security: Rejects Dispense Confirmation from Unauthorized Key (1240ms)
+    ✔ 8. Validates Emergency Refund Workflow on Hardware Jam (1285ms)
+
+  8 passing (4.2s)

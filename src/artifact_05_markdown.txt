@@ -1,0 +1,19 @@
+### 0:00 - 0:20: The Hook & The Physical Reality
+[VISUAL]: Close-up cinematic 4K 60fps shot of the BAXUS physical vending machine glass. Inside sits a vintage bottle of Pappy Van Winkle 23 Year wrapped in BAXUS holographic vault tags.
+[SPEAKER]: "High-end spirits are the ultimate Real World Asset. But taking them IRL to Solana Breakpoint in a vending machine introduces a massive cryptographic dilemma: How do you guarantee a spin is provably fair, immune to MEV, and physically synced to the drop motor without ever jamming or double-spending?"
+
+### 0:20 - 0:50: The Live On-Chain Spin
+[VISUAL]: Screen split. Left side: Creator swipes to spin on the BAXUS mobile dApp, paying 50 USDC. Right side: Terminal logs showing `commit_spin` instruction confirming at slot 284102914.
+[SPEAKER]: "Watch this live. The creator taps Spin. We generate a client-side seed combined with the cryptographic hash of our 4K video recording. The Anchor program commits the funds into our isolated machine escrow PDA. Because of our two-stage architecture, even the validator producing the block cannot predict which bottle drops."
+
+### 0:50 - 1:20: The Hardware Handshake & Mechanical Drop
+[VISUAL]: Vending machine stepper motor activates. The carousel turns to Slot #7 (Gold Tier). The bottle drops through the optical chute. An oscilloscope / hardware overlay shows the 240ms infrared drop pulse.
+[SPEAKER]: "The Switchboard VRF resolves the entropy. Slot 7 is selected. An encrypted WebSocket payload instructs the ESP32-S3 controller to activate the carousel. As the bottle drops through the laser curtain, the beam occludes for exactly 240 milliseconds. The onboard secure element signs that optical signature and fires `dispense_hardware_ack` on-chain."
+
+### 1:20 - 1:45: Jam Protection & Creator Provenance
+[VISUAL]: Over-the-shoulder view: Creator picks up the bottle from the bin, scans the NFC chip on the neck. Phantom pop-up displays the newly transferred Metaplex RWA title matching the serial number.
+[SPEAKER]: "If the motor had jammed, our 180-second timeout allows an instant deterministic refund directly from the PDA. But here, the hardware receipt matches, the stock is safely decremented, and the creator's video hash is permanently etched into the ledger. Real liquor. Real blockchain. Zero trust required."
+
+### 1:45 - 2:00: Closing Pitch
+[VISUAL]: BAXUS logo with GitHub repo link, testnet explorer transactions, and live Discord bot link.
+[SPEAKER]: "This isn't a mock dApp—it's a production-tested, gas-optimized, IoT-bridged protocol built to bring the next billion dollars of physical assets to Solana. We're BAXUS Creators, and this is how you build IRL Web3."

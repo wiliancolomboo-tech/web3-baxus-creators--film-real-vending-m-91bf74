@@ -1,0 +1,112 @@
+<!-- creator_overlay/hud.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BAXUS Real Vending Spin HUD</title>
+  <style>
+    body {
+      margin: 0;
+      background: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #FFF;
+      overflow: hidden;
+    }
+    .hud-card {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      width: 380px;
+      background: rgba(18, 18, 20, 0.88);
+      border: 1px solid #D4AF37; /* BAXUS Gold */
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 4px;
+      background: #D4AF37;
+      color: #000;
+    }
+    .title {
+      font-size: 20px;
+      margin: 12px 0 6px 0;
+      font-weight: 600;
+    }
+    .field {
+      font-size: 13px;
+      color: #A0A0A5;
+      margin-top: 8px;
+    }
+    .value {
+      color: #FFF;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+    }
+    .status-pulse {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #00FFA3;
+      margin-right: 6px;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.7; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hud-card" id="hudCard">
+    <div>
+      <span class="status-pulse"></span>
+      <span class="badge">BAXUS Live Telemetry</span>
+    </div>
+    <div class="title" id="statusTitle">Awaiting Spin...</div>
+    <div class="field">User: <span class="value" id="userAddress">--</span></div>
+    <div class="field">Tier Awarded: <span class="value" id="tierAwarded">--</span></div>
+    <div class="field">On-Chain Slot: <span class="value" id="slotNumber">--</span></div>
+    <div class="field">Proof Tx: <span class="value" id="txSig">--</span></div>
+  </div>
+
+  <script>
+    const ws = new WebSocket("ws://localhost:8088");
+    const statusTitle = document.getElementById("statusTitle");
+    const userAddress = document.getElementById("userAddress");
+    const tierAwarded = document.getElementById("tierAwarded");
+    const slotNumber = document.getElementById("slotNumber");
+    const txSig = document.getElementById("txSig");
+
+    const TIER_NAMES = ["Bourbon Rare", "Single Malt Reserve", "Cask Strength", "Pappy Van Winkle", "Macallan 25"];
+
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      if (msg.type === "SPIN_STARTED") {
+        statusTitle.innerText = "SPINNING & DISPENSING";
+        statusTitle.style.color = "#D4AF37";
+        userAddress.innerText = msg.user.slice(0, 6) + "..." + msg.user.slice(-4);
+        tierAwarded.innerText = `${TIER_NAMES[msg.tier] || "Tier " + msg.tier}`;
+        slotNumber.innerText = msg.slot;
+      } else if (msg.type === "DISPENSE_CONFIRMED") {
+        statusTitle.innerText = "BOTTLE DISPENSED & TRANSFERRED";
+        statusTitle.style.color = "#00FFA3";
+        txSig.innerText = msg.txSignature.slice(0, 10) + "..." + msg.txSignature.slice(-6);
+      } else if (msg.type === "HARDWARE_JAM_ALERT") {
+        statusTitle.innerText = "JAM DETECTED - ESCROW REFUND READY";
+        statusTitle.style.color = "#FF4444";
+      }
+    };
+  </script>
+</body>
+</html>

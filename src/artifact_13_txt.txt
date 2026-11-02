@@ -1,0 +1,25 @@
++----------------------------------------------------------------------------------------------------+
+|                                    SECURITY ARCHITECTURE MATRIX                                    |
++------------------------------------+----------------------------------+----------------------------+
+| Attack Vector / Failure Mode       | Severity                         | Mitigation in BOVP         |
++------------------------------------+----------------------------------+----------------------------+
+| 1. Front-Running Entropy           | CRITICAL (Prize theft)           | Two-phase Commit-Reveal    |
+|    (Miner/Validator peek roll)     |                                  | with 1-slot delay floor.   |
+|                                    |                                  | Preimage hash verification |
++------------------------------------+----------------------------------+----------------------------+
+| 2. Mechanical Jam / False Dispense | HIGH (Inventory desync)          | Optical IR Drop Sensor     |
+|                                    |                                  | must trigger hardware key  |
+|                                    |                                  | to sign state decrement.   |
++------------------------------------+----------------------------------+----------------------------+
+| 3. Reentrancy / State Clashing     | HIGH (Drain funds)               | Single-flight lock check;  |
+|                                    |                                  | status transitions strictly|
+|                                    |                                  | Committed -> Resolved ->   |
+|                                    |                                  | Dispensed.                 |
++------------------------------------+----------------------------------+----------------------------+
+| 4. Inventory Underflow             | HIGH (Ghost dispensing)          | Explicit checked_sub math; |
+|                                    |                                  | fallback routing if rare   |
+|                                    |                                  | tier empty.                |
++------------------------------------+----------------------------------+----------------------------+
+| 5. Fake Hardware Confirmation      | CRITICAL (Bogus inventory drops) | Dedicated hardware_key PDA |
+|                                    |                                  | signer validation.         |
++------------------------------------+----------------------------------+----------------------------+

@@ -1,0 +1,5 @@
+RPC_WSS_URL="ws://127.0.0.1:8900"
+MACHINE_ID=101
+HARDWARE_KEYPAIR_PATH="./hardware-authority.json"
+PINATA_JWT="your_pinata_jwt_token_here"
+SERIAL_PORT_PATH="/dev/ttyUSB0"

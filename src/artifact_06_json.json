@@ -1,0 +1,13 @@
+{
+  "type": "SPIN_RESULT",
+  "payload": {
+    "machine": "BXUSvm1111111111111111111111111111111111111",
+    "user": "5wQ8hR9mK9...",
+    "tier": 1,
+    "tierName": "Top Shelf / Yamazaki 18yr",
+    "nftMint": "BXSbt1e111111111111111111111111111111111111",
+    "txSignature": "4rF2k...",
+    "timestamp": 1711928400000,
+    "verificationHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

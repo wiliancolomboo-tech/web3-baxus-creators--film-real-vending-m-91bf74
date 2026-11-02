@@ -1,0 +1,8 @@
+baxus_vending physical spin & proof tests
+    ✔ 1. Initializes Physical Vending Machine PDA and Token Escrow (412ms)
+    ✔ 2. Registers an RWA bottle slot in inventory (189ms)
+    ✔ 3. User triggers on-chain spin: Escrows 50 USDC & initializes session (321ms)
+    ✔ 4. Hardware Keeper senses physical drop, hashes filmed video MP4, and confirms dispense (405ms)
+    ✔ 5. Rejects unauthorized keeper trying to confirm dispense (88ms)
+
+  5 passing (1.4s)

@@ -1,0 +1,18 @@
+┌───────────────────────────────┬───────────────────────────────────┬────────────────────────────────────────┐
+│ Attack Vector                 │ Threat Severity                   │ Architecture Defense Mechanism         │
+├───────────────────────────────┼───────────────────────────────────┼────────────────────────────────────────┤
+│ Front-Running / MEV Hijack    │ HIGH                              │ Randomness and bottle selection are    │
+│                               │                                   │ locked to a discrete Slot & Nonce PDA; │
+│                               │                                   │ unrevealed prior to user fee lock.     │
+├───────────────────────────────┼───────────────────────────────────┼────────────────────────────────────────┤
+│ Fake Attestation Injections   │ CRITICAL                          │ Strict `has_one = hardware_oracle`     │
+│                               │                                   │ enforcement. Non-authorized keypairs   │
+│                               │                                   │ fail at the Anchor account parser.     │
+├───────────────────────────────┼───────────────────────────────────┼────────────────────────────────────────┤
+│ Physical Actuator Failure /   │ HIGH                              │ Automatic grace period counter         │
+│ Jammed Carousel               │                                   │ (`DISPENSER_TIMEOUT_SLOTS`). User      │
+│                               │                                   │ triggers self-serve `claim_refund`.    │
+├───────────────────────────────┼───────────────────────────────────┼────────────────────────────────────────┤
+│ PDA Reentrancy & Double Claim │ CRITICAL                          │ Mutex pattern using `SpinStatus` state │
+│                               │                                   │ machine (`Awaiting` -> `Dispensed`).   │
+└───────────────────────────────┴───────────────────────────────────┴────────────────────────────────────────┘

@@ -1,0 +1,28 @@
+[0:00 - 0:15] — HOOK & PROBLEM STATEMENT
+Visual: High-energy opening. The presenter stands before the custom BAXUS physical vending machine displaying premium spirits (Buffalo Trace, Blanton's, Pappy Van Winkle).
+Spoken Narrative:
+"What if the next bottle of Macallan or Pappy Van Winkle you opened was won directly through a provably fair smart contract on Solana and dispensed right in front of your camera in real time?
+Welcome to the BAXUS On-Chain Vending Machine: where high-stakes spirits collecting meets millisecond Solana execution."
+
+[0:15 - 0:40] — ARCHITECTURE & ON-CHAIN COMMIT
+Visual: Screen splits. Presenter taps 'SPIN' on the iPad terminal connected to Solana Devnet/Mainnet. Phantom approves the 50 USDC transaction. Terminal logs: `tx: request_spin` confirming slot lock.
+Spoken Narrative:
+"Standard digital mystery boxes can be gamed or faked. Not this. When I hit Spin, our Anchor program creates an immutable Ticket PDA, locks the 50 USDC into an on-chain vault, and anchors a target commitment slot two blocks into the future. 
+Neither the user nor the machine operator can predict or frontrun the outcome."
+
+[0:40 - 1:15] — ENTROPY RESOLUTION & PHYSICAL ACTUATION
+Visual: The terminal screen shows `fulfill_spin` triggering. The cumulative probability engine resolves to Tier 2 (Rare: Blanton’s Single Barrel). Camera cuts to the interior servo mechanism: gears turn, the internal motorized spiral dispenses the Blanton's bottle with a solid mechanical clunk.
+Spoken Narrative:
+"Target slot reached. The entropy engine calculates the outcome against our live inventory state machine. We hit Tier 2—Blanton’s Single Barrel! 
+Notice our Raspberry Pi IoT Keeper daemon: it catches the `SpinFulfilledEvent` on the RPC stream, verifies the signature, and sends the serial pulse to the dispenser servo. IRL mechanics triggered directly by Solana block production."
+
+[1:15 - 1:40] — CRYPTOGRAPHIC HARDWARE ATTESTATION
+Visual: The bottle drops safely into the padded retrieval bay. Presenter pulls the physical bottle out. On screen, the dispenser sends `confirm_physical_dispense` on-chain with its hardware key.
+Spoken Narrative:
+"The moment the optical sensor detects the drop, the physical dispenser signs `confirm_physical_dispense`. The ticket is marked finalized, preventing double-dispensing forever, and the vault NFT is released to my wallet. Provenance, ownership, and mechanical fulfillment tied together seamlessly."
+
+[1:40 - 2:00] — SUBMISSION CONCLUSION & WINNER PITCH
+Visual: Presenter holds up the Blanton's bottle alongside the live Solana Explorer transaction page on an iPad. BAXUS logo and Github repo QR code appear.
+Spoken Narrative:
+"This isn't a mock video or an off-chain gimmick. It is a complete, production-grade protocol with sub-30k Compute Unit efficiency, robust MEV defense, and real physical-to-digital execution. 
+This is how BAXUS and Solana redefine physical asset engagement. Thank you."

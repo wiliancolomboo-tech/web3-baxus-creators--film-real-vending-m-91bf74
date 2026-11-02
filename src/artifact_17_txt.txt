@@ -1,0 +1,27 @@
+====================================================================================================
+TIME    | CAMERA ANGLE             | VISUAL ON SCREEN                       | SPOKEN SCRIPT / NARRATIVE
+====================================================================================================
+00:00 - | Dynamic Wide Pan         | Creator walks up to glowing physical   | "This is the world's first Solana-
+00:15   | (Cam A)                  | BAXUS Spirits Vending Machine at the   | powered high-end spirits vending
+        |                          | venue. Machine displays whiskey vault. | machine by BAXUS. Real bottles. Real RWAs."
+----------------------------------------------------------------------------------------------------
+00:15 - | Over-the-Shoulder Zoom   | Creator pulls out Phantom wallet,      | "Forget tokens that stay on a screen.
+00:35   | (Cam B)                  | scans on-screen QR code for a $25 spin | I'm tapping Phantom, approving 25 USDC,
+        |                          | on Solana Mainnet.                     | and executing an on-chain commit ticket."
+----------------------------------------------------------------------------------------------------
+00:35 - | Split Screen:            | Left: Phantom pops green checkmark.    | "Watch this: 400 milliseconds. 
+00:55   | Phone UI + Machine Glass | Right: Internal LEDs flash purple;     | The Solana program triggers the entropy
+        |                          | wheels spin on machine LCD HUD.        | commit-reveal. What tier are we hitting?!"
+----------------------------------------------------------------------------------------------------
+00:55 - | Ultra Slow-Mo 120 FPS    | Machine spiral #3 turns. Heavy bottle  | "HOLY GRAIL! That's a bottle of allocated
+01:25   | Inside Dispenser Bin     | of Blanton's Gold drops through the IR | Bourbon dropping into the tray!
+        |                          | drop sensor beam. Glass clinks softly. | Look at the seal. Completely authentic."
+----------------------------------------------------------------------------------------------------
+01:25 - | Close-up Macro Pan       | Creator opens vault flap, pulls out    | "Drop sensor confirms on-chain via our IoT
+01:45   | On Bottle & NFC Tag      | the physical bottle, taps NFC chip on  | daemon, and the 1:1 BAXUS digital bottle
+        |                          | cork with smartphone to show metadata. | token is burned or added to my vault portfolio."
+----------------------------------------------------------------------------------------------------
+01:45 - | Outro Creator Callout    | Creator holds bottle high, smiling.    | "Real-world assets meet Solana speed. BAXUS
+02:00   | (Cam A)                  | On-screen watermark: Signature + QR.   | is redefining ownership one spin at a time.
+        |                          |                                        | Check the description for the transaction proof!"
+====================================================================================================

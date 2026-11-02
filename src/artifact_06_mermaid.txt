@@ -1,0 +1,5 @@
+graph LR
+    Sub1[Attack Vector: Reentrancy] --> Def1[Defense: Check-Effects-Interactions Pattern & Status Enums]
+    Sub2[Attack Vector: Hardware Impersonation] --> Def2[Defense: Strict Pubkey check against VendingMachineConfig.hardware_pubkey]
+    Sub3[Attack Vector: Creator Reward Sybil] --> Def3[Defense: Nullifier check on spin_record.creator == Pubkey::default]
+    Sub4[Attack Vector: Unchecked Account Spoofing] --> Def4[Defense: Anchor PDA bump constraints & owner validation]
