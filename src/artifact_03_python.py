@@ -59,7 +59,7 @@ class VendingHardwareController:
                 hasher.update(chunk)
         return hasher.digest()
 
-    def simulate_hardware_actuation_and_drop(self, slot_id: int) -> bool:
+    def simulate_hardware_test_000000000000000000000000(self, slot_id: int) -> bool:
         logging.info(f"Actuating coil motor for Slot #{slot_id}...")
         time.sleep(2.5) # Simulating physical motor rotation
         logging.info("IR Drop Array: Beam break detected! Bottle settled into delivery bay.")
@@ -80,7 +80,7 @@ class VendingHardwareController:
         record_task = asyncio.to_thread(self.trigger_camera_recording, str(ticket_pubkey)[:8], 10)
 
         # 2. Actuate Physical Motors
-        drop_success = await asyncio.to_thread(self.simulate_hardware_actuation_and_drop, slot_id)
+        drop_success = await asyncio.to_thread(self.simulate_hardware_test_000000000000000000000000, slot_id)
         if not drop_success:
             logging.error("Mechanical drop failure! Jam registered.")
             return

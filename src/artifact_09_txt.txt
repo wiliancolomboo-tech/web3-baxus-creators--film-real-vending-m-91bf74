@@ -5,5 +5,5 @@
 [HARDWARE] Actuator firing: Opening physical solenoid gate...
 [HARDWARE] IR Sensor Beam Broken: Bottle confirmed physically dropped.
 [CAMERA] Video footage recorded: /var/baxus/recordings/spin_ticket_0.mp4
-[ARWEAVE] Uploaded proof hash: 7d2b512c9b4e3391b151a66270cf17c1bf86ec70cb0fa2ff345b1418b7625121
+[ARWEAVE] Uploaded proof hash: 0000000000000000000000000000000000000000000000000000000000000000
 [SOLANA] Attestation confirmed on-chain! Tx Signature: 4Z3xV7fW9K...

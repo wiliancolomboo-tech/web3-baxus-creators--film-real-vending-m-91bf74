@@ -1,4 +1,4 @@
-// scripts/hardware_dispenser_daemon.js
+// scripts/hardware_test_000000000000000000000000.js
 const { Connection, Keypair, PublicKey } = require("@solana/web3.js");
 const { Program, AnchorProvider, Wallet } = require("@coral-xyz/anchor");
 const idl = require("../target/idl/baxus_vending.json");
